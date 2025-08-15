@@ -19,32 +19,7 @@ error_exit() {
     exit 1
 }
 
-# 检查必要的依赖
-check_dependencies() {
-    local missing_deps=()
-    
-    # 检查 Docker 是否存在
-    if ! command -v docker &> /dev/null; then
-        missing_deps+=("docker")
-    fi
-    
-    # 检查 acme.sh 是否存在（使用 type 命令检测所有类型的命令）
-    if ! type acme.sh &> /dev/null; then
-        missing_deps+=("acme.sh")
-    fi
-    
-    # 如果有缺失的依赖，显示错误并退出
-    if [ ${#missing_deps[@]} -gt 0 ]; then
-        echo -e "${RED}Error:${NC} The following dependencies are missing:"
-        for dep in "${missing_deps[@]}"; do
-            echo -e "  - ${RED}$dep${NC}"
-        done
-        echo -e "${RED}Please install them before running this script.${NC}"
-        exit 1
-    else
-        echo -e "${GREEN}All dependencies are available.${NC}"
-    fi
-}
+
 
 check_env_vars() {
     for var in "$@"; do
@@ -300,8 +275,6 @@ EOF
 }
 
 # 主入口
-# 首先检查依赖
-check_dependencies
 
 case "$1" in
     init)
