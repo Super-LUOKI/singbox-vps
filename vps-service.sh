@@ -2,11 +2,10 @@
 
 set -e
 
-# 启用别名
-shopt -s expand_aliases
+ACME_SH=acme.sh
 
-if command -v acme.sh &> /dev/null; then
-    alias acme.sh=~/.acme.sh/acme.sh
+if ! command -v acme.sh &> /dev/null; then
+    ACME_SH=~/.acme.sh/acme.sh
 fi
 
 source ~/.bashrc
@@ -144,9 +143,9 @@ cmd_dns_ssl() {
     local email="${emails[-1]}"
 
     # 仅当账户未注册时才执行注册（避免重复注册）
-    if ! acme.sh --list-account >/dev/null 2>&1; then
+    if ! ACME_SH --list-account >/dev/null 2>&1; then
         echo "First run, registering ACME account with email $email..."
-        acme.sh --register-account -m "$email" || error_exit "Account registration failed"
+        ACME_SH --register-account -m "$email" || error_exit "Account registration failed"
     fi
 
     # 构建域名参数（将数组转换为 -d domain1 -d domain2 格式）
@@ -157,7 +156,7 @@ cmd_dns_ssl() {
 
     # 申请证书
     echo "Starting certificate application for the following domains: ${domains[*]}"
-    acme.sh --issue --dns dns_cf "${domain_args[@]}" || error_exit "Certificate application failed"
+    ACME_SH --issue --dns dns_cf "${domain_args[@]}" || error_exit "Certificate application failed"
 
     echo "Certificate application successful!"
 }
@@ -168,7 +167,7 @@ cmd_install_cert() {
     if [ "$#" -lt 1 ]; then
         error_exit "Please provide a domain name, for example: $0 install-cert -d example.com"
     fi
-    acme.sh --install-cert "$@" \
+    ACME_SH --install-cert "$@" \
         --key-file "${VPS_SSL_CERTS_DIR}/key.pem" \
         --fullchain-file "${VPS_SSL_CERTS_DIR}/cert.pem" \
         --reloadcmd "docker restart service-nginx && docker restart service-sing-box"
