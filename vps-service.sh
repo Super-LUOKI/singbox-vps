@@ -5,6 +5,10 @@ set -e
 # 启用别名
 shopt -s expand_aliases
 
+if command -v acme.sh &> /dev/null; then
+    alias acme.sh=~/.acme.sh/acme.sh
+fi
+
 source ~/.bashrc
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
