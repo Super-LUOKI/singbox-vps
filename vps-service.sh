@@ -1,11 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash -l
 
 set -e
-
-# Load user shell configuration to get proper PATH and aliases
-if [ -f "$HOME/.bashrc" ]; then
-    source "$HOME/.bashrc" >/dev/null 2>&1 || true
-fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 COMPOSE_FILE="${SCRIPT_DIR}/docker-compose.yml"
