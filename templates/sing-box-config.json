@@ -1,0 +1,47 @@
+{
+    "inbounds": [
+        {
+            "type": "trojan",
+            "tag": "trojan-in",
+            "listen": "0.0.0.0",
+            "listen_port": 443,
+            "users": [
+                {
+                    "name": "admin",
+                    "password": "123456"
+                }
+            ],
+            "tls": {
+                "enabled": true,
+                "cert": "/ssl_certs/cert.pem",
+                "key": "/ssl_certs/key.pem",
+                "alpn": [
+                    "h2",
+                    "http/1.1"
+                ],
+                "fallback": {
+                    "server": "work-network",
+                    "server_port": 8080
+                }
+            },
+            "fallback_for_alpn": {
+                "http/1.1": {
+                    "server": "work-network",
+                    "server_port": 8443
+                }
+            },
+            "multiplex": {
+                "enabled": true,
+                "concurrency": 8
+            },
+            "transport": {
+                "tls_record_fragment": 1024
+            }
+        }
+    ],
+    "outbounds": [
+        {
+            "type": "direct"
+        }
+    ]
+}
