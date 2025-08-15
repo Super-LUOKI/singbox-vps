@@ -2,6 +2,8 @@
 
 set -e
 
+source ~/.bashrc
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 COMPOSE_FILE="${SCRIPT_DIR}/docker-compose.yml"
 
