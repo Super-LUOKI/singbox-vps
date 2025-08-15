@@ -3,7 +3,7 @@ services:
     image: nginx:latest
     container_name: service-nginx
     ports:
-      - "8000:8000"
+      - "80:80"
       - "8443:8443"
     volumes:
       - ${VPS_CONFIG_DIR}/nginx/static:/static
