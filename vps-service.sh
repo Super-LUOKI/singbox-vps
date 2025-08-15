@@ -59,6 +59,14 @@ cmd_init() {
     check_env_vars VPS_CONFIG_DIR VPS_SSL_CERTS_DIR
 
     echo -e "${GREEN}[1/3] Starting Docker services...${NC}"
+
+    if [ -n "$(docker ps -q -f name=service-sing-box)" ]; then
+        docker stop service-sing-box
+    fi
+    if [ -n "$(docker ps -q -f name=service-nginx)" ]; then
+        docker rm service-nginx
+    fi
+
     docker compose -f "$COMPOSE_FILE" build
 
     echo -e "${GREEN}[2/3] Initializing configuration files...${NC}"
