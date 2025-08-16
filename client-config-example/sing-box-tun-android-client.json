@@ -28,8 +28,7 @@
         "disable_expire": false,
         "independent_cache": true,
         "cache_capacity": 65535,
-        "reverse_mapping": false,
-        "client_subnet": ""
+        "reverse_mapping": false
     },
     "inbounds": [
         {
@@ -80,12 +79,12 @@
         {
             "tag": "ServerTrojan",
             "type": "trojan",
-            "server": "",
+            "server": "your_domain_or_vps_ip",
             "server_port": 443,
             "password": "123456",
             "tls": {
                 "enabled": true,
-                "server_name": "",
+                "server_name": "your_domain_or_any_domain_you_want",
                 "insecure": true,
                 "alpn": [
                     "h2",
