@@ -1,0 +1,195 @@
+{
+    "log": {
+        "disabled": false,
+        "level": "trace",
+        "timestamp": true
+    },
+    "dns": {
+        "servers": [
+            {
+                "type": "https",
+                "tag": "WallOutDnsServer",
+                "server": "1.1.1.1",
+                "server_port": 443,
+                "path": "/dns-query",
+                "detour": "DnsQuery"
+            },
+            {
+                "type": "h3",
+                "tag": "WallInDnsServer",
+                "server": "223.5.5.5",
+                "server_port": 443,
+                "path": "/dns-query"
+            }
+        ],
+        "final": "WallOutDnsServer",
+        "strategy": "ipv4_only",
+        "disable_cache": false,
+        "disable_expire": false,
+        "independent_cache": true,
+        "cache_capacity": 65535,
+        "reverse_mapping": false,
+        "client_subnet": "42.48.162.23"
+    },
+    "inbounds": [
+        {
+            "tag": "tun-in",
+            "type": "tun",
+            "address": [
+                "172.16.0.1/30",
+                "fd00::1/126"
+            ],
+            "mtu": 9000,
+            "auto_route": true,
+            "loopback_address": [
+                "10.7.0.1"
+            ],
+            "route_exclude_address": [
+                "192.168.0.0/16",
+                "fc00::/7"
+            ],
+            "stack": "system"
+        },
+        {
+            "type": "mixed",
+            "tag": "MixedIn",
+            "listen": "127.0.0.1",
+            "listen_port": 8890,
+            "set_system_proxy": false
+        }
+    ],
+    "outbounds": [
+        {
+            "type": "direct",
+            "tag": "DirectOut"
+        },
+        {
+            "type": "selector",
+            "tag": "DnsQuery",
+            "outbounds": [
+                "ServerTrojan"
+            ]
+        },
+        {
+            "type": "selector",
+            "tag": "Proxy",
+            "outbounds": [
+                "ServerTrojan"
+            ]
+        },
+        {
+            "tag": "ServerTrojan",
+            "type": "trojan",
+            "server": "",
+            "server_port": 443,
+            "password": "123456",
+            "tls": {
+                "enabled": true,
+                "server_name": "",
+                "insecure": true,
+                "alpn": [
+                    "h2",
+                    "http/1.1"
+                ],
+                "utls": {
+                    "enabled": true,
+                    "fingerprint": "chrome"
+                }
+            },
+            "multiplex": {
+                "enabled": true
+            },
+            "domain_resolver":"WallInDnsServer"
+        }
+    ],
+    "route": {
+        "rules": [
+            {
+                "action": "sniff"
+            },
+            {
+                "protocol": "dns",
+                "action": "hijack-dns"
+            },
+            {
+                "port": [
+                    53,
+                    853
+                ],
+                "action": "reject"
+            },
+            {
+                "protocol": [
+                    "quic",
+                    "dtls",
+                    "stun"
+                ],
+                "action": "reject",
+                "method": "default",
+                "no_drop": true
+            },
+            {
+                "rule_set": "aw-avenue-ads-rules",
+                "action": "reject"
+            },
+            {
+                "action": "route",
+                "rule_set": [
+                    "tld-cn-geosite",
+                    "maxmind-cn-ip",
+                    "maxmind-cn-ipv6",
+                    "cn-geosite",
+                    "cn-location-geosite"
+                ],
+                "outbound": "DirectOut"
+            }
+        ],
+        "rule_set": [
+            {
+                "tag": "aw-avenue-ads-rules",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Singbox.srs",
+                "download_detour": "Proxy"
+            },
+            {
+                "tag": "tld-cn-geosite",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://github.com/SagerNet/sing-geosite/raw/rule-set/geosite-tld-cn.srs",
+                "download_detour": "Proxy"
+            },
+            {
+                "tag": "maxmind-cn-ip",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/Dreista/sing-box-rule-set-cn/rule-set/maxmind-cn-ipv4.srs",
+                "download_detour": "Proxy"
+            },
+            {
+                "tag": "maxmind-cn-ipv6",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/Dreista/sing-box-rule-set-cn/rule-set/maxmind-cn-ipv6.srs",
+                "download_detour": "Proxy"
+            },
+            {
+                "tag": "cn-geosite",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://github.com/SagerNet/sing-geosite/raw/rule-set/geosite-cn.srs",
+                "download_detour": "Proxy"
+            },
+            {
+                "tag": "cn-location-geosite",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://github.com/SagerNet/sing-geosite/raw/rule-set/geosite-geolocation-cn.srs",
+                "download_detour": "Proxy"
+            }
+        ],
+        "default_domain_resolver":"WallOutDnsServer",
+        "final": "Proxy",
+        "auto_detect_interface": true
+    }
+}
