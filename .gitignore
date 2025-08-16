@@ -1,3 +1,4 @@
 config
 ssl_certs
 .env
+test-config.json
