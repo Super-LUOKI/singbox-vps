@@ -8,7 +8,9 @@ if ! command -v acme.sh &> /dev/null; then
     ACME_SH=~/.acme.sh/acme.sh
 fi
 
-source ~/.bashrc
+if [ -f ~/.bashrc ]; then
+    source ~/.bashrc
+fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 COMPOSE_FILE="${SCRIPT_DIR}/docker-compose.yml"
